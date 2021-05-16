@@ -118,17 +118,17 @@ def main():
     """    
     #a)
     A = np.loadtxt('A_test_1.txt')
-    b = np.loadtxt('b_test_1.txt')
-    Q = np.loadtxt('Q_test_1.txt')
+    c = np.loadtxt('c_test_1.txt')
+    B = np.loadtxt('B_test_1.txt')
     # Q, A, b = generate_vars()
 
     #b)
-    x_star = cvxpot_qp(A,b,Q*2)
+    x_star = cvxpot_qp(A,c,B*2)
     print('cvx output')
     print(x_star)
 
     #c) 
-    x_k, i, error_i = alm(Q,A,b)
+    x_k, i, error_i = alm(B,A,c)
     print()
     print('Augmented Lagrangian method output')
     print(x_k)

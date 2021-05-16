@@ -3,24 +3,24 @@
 import numpy as np
 import scipy.optimize as opt
 
+B = np.loadtxt('B.txt')
 c = np.loadtxt('c.txt')
-b = np.loadtxt('b.txt')
-Q = np.loadtxt('Q.txt')
+d = np.loadtxt('d.txt')
 
-def gen_Q_b_c(n=5):
+def gen_B_c_d(n=5):
     """[Function created from Q_b_c.py to quickly test program]
 
     Args:
         n (int, optional): [size of matrix Q (n,n) and vector b (n,)]. Defaults to 5.
 
     Returns:
-        [Q,b,c]: [(5,5) numpy P.D matrix, (5,1) numpy vector, () numpy scaler]
+        [B,c,d]: [(5,5) numpy P.D matrix, (5,1) numpy vector, () numpy scaler]
     """    
     Q=np.random.random((n,n))
-    Q=Q.dot(Q.T)+0.1*np.identity(n)
-    b=np.random.random(n)
-    c=np.random.random(1)
-    return Q, b, c
+    B=Q.dot(Q.T)+0.1*np.identity(n)
+    c=np.random.random(n)
+    d=np.random.random(1)
+    return B, c, d
 
 def is_pos_def(x):
     """[Returns True if matrix is positive definite]
@@ -33,9 +33,9 @@ def is_pos_def(x):
     """    
     return np.all(np.linalg.eigvals(x) > 0)
 
-# Q,b,c = gen_Q_b_c() #uncomment for testing
+# B,c,d = gen_B_c_d() #uncomment for testing
 
-def f_x(x ,Q = Q, b =b, c = c):
+def f_x(x ,Q = B, b =c, c = d):
     """[Mathematical Function of Interest: f(x) = x^T Q x + b^T x + c]
 
     Args:
@@ -49,7 +49,7 @@ def f_x(x ,Q = Q, b =b, c = c):
     """    
     return x.T@Q@x + b.T@x + c 
 
-def nabla_f_x(x ,Q = Q, b =b):
+def nabla_f_x(x ,Q = B, b =c):
     r"""[Gradient of Mathematical Function of Interest: \nabla f(x) = 2Qx +b ]
 
     Args:
@@ -63,7 +63,7 @@ def nabla_f_x(x ,Q = Q, b =b):
 
     return 2*Q@x + b
 
-def get_alpha_k(x_k, method = 0, Q=Q):
+def get_alpha_k(x_k, Q, method = 0 ):
     """[Provides 3 different ways of finding alpha]
 
     Args:
@@ -161,7 +161,7 @@ def method_identifer(method):
     else: 
         print('GD - Steepest Descent')
 
-def gradient_descent(x_k, method = 0, epsilon = 10**(-6)):
+def gradient_descent(x_k, B, method = 0, epsilon = 10**(-6)):
     """[return gradient descent's x_k, f_x(x_k), epsilon, and num of interations (k)]
 
     Args:
@@ -186,7 +186,7 @@ def gradient_descent(x_k, method = 0, epsilon = 10**(-6)):
     
     i = 0
     while True:     
-        alpha_k = get_alpha_k(x_k, method= method)
+        alpha_k = get_alpha_k(x_k, B, method= method)
         x_k = x_k - alpha_k*nabla_f_x(x_k)
         
         error =np.linalg.norm(nabla_f_x(x_k))
@@ -227,16 +227,18 @@ def reasonable_error(x_k, x_star, method = 0):
 def main():
     """[Main function]
     """    
+
+
     #a)
     epsilon = 10**(-6)
-    x_k0, f_x_k, epsilon, numofinter = gradient_descent(b, method =0, epsilon=epsilon) 
+    x_k0, f_x_k, epsilon, numofinter = gradient_descent(c, B, method =0, epsilon=epsilon) 
 
-    # x_k1, f_x_k, epsilon, numofinter = gradient_descent(b, method =1, epsilon=epsilon) 
+    x_k1, f_x_k, epsilon, numofinter = gradient_descent(c, B, method =1, epsilon=epsilon) 
 
-    x_k2, f_x_k, epsilon, numofinter = gradient_descent(b, method =2, epsilon=epsilon)
+    x_k2, f_x_k, epsilon, numofinter = gradient_descent(c, B, method =2, epsilon=epsilon)
 
     #b) 
-    x_l = -np.linalg.inv(Q)@b*(.5) 
+    x_l = -np.linalg.inv(B)@c*(.5) 
     f_l = f_x(x_l)
 
     print('x^*_l : {}'.format(x_l))
@@ -244,7 +246,7 @@ def main():
     print()
 
     #c)
-    res  = opt.minimize(f_x, b)
+    res  = opt.minimize(f_x, c)
     x_star = res.x
     f_star = f_x(x_star)
 

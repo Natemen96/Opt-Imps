@@ -7,7 +7,7 @@ Install [Purple Pi](https://github.com/nschloe/purple-pi) to Render Math
 ## Solving for x using Augmented Lagrangian Method
 
 $$
-L(x,\lambda,c) = min_x  x^T Q x + \frac{c}{2} \|| Ax -b \||_2^2 + \lambda^T (Ax - b)
+L(x,\lambda,c) = min_x  x^T B x + \frac{c}{2} \|| Ax -c \||_2^2 + \lambda^T (Ax - c)
 $$
 
 $$
@@ -15,11 +15,11 @@ $$
 $$
 
 $$
-\nabla_x L(x,\lambda) =  2 Q x + c A^T A x - c A^T b +  A^T \lambda
+\nabla_x L(x,\lambda) =  2 B x + d A^T A x - d A^T c +  A^T \lambda
 $$
 
 $$
-\implies x =  (2Q + cA^TA)^{-1} (CA^T b - A^T \lambda)
+\implies x =  (2B + dA^TA)^{-1} (CA^T b - A^T \lambda)
 $$
 
 <!-- ## Solving for Lambda using KKT
