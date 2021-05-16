@@ -15,11 +15,11 @@ $$
 $$
 
 $$
-\nabla_x L(x,\lambda) =  2 Q x + c A^T A x - c A^T b +  A^T \lambda 
+\nabla_x L(x,\lambda) =  2 Q x + c A^T A x - c A^T b +  A^T \lambda
 $$
 
 $$
-\implies x =  (2Q + cA^TA)^{-1} (CA^T b - A^T \lambda) 
+\implies x =  (2Q + cA^TA)^{-1} (CA^T b - A^T \lambda)
 $$
 
 <!-- ## Solving for Lambda using KKT
@@ -36,7 +36,7 @@ $$
 
 ## Links and Resources
 
-[Tutorial on how to use Cvxopt for Python]([https://courses.csail.mit.edu/6.867/wiki/images/a/a7/Qp-cvxopt.pdf)
+[Tutorial on how to use Cvxopt for Python](https://courses.csail.mit.edu/6.867/wiki/images/a/a7/Qp-cvxopt.pdf)
 
 [Prof. Li notes on Augmented Lagrangian method](https://www.dropbox.com/s/dugdkzba4sdj0ru/augmented-Lagrangian-method.pdf?dl=0)
 

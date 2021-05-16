@@ -7,7 +7,6 @@ from cvxopt import matrix
 from cvxopt.solvers import qp
 import matplotlib.pyplot as plt
 
-
 def generate_vars(n=100, m = 30):
     """[returns Q- nxn, A - mxn, b - mx1]
 
@@ -26,7 +25,6 @@ def generate_vars(n=100, m = 30):
     A = np.random.uniform(size=(m,n))
     b = np.random.uniform(size=(m))
     return Q, A, b
-
 
 def cvxpot_qp(A,b,Q):
     """[return x_star]
@@ -49,7 +47,6 @@ def cvxpot_qp(A,b,Q):
     cvx_results= qp(P = P, q = q, A=A, b=b)
 
     return np.asarray(cvx_results['x']).flatten()
-
 
 def lagrangian_x(A,b,Q,c,lam):
     """[returns x_k based on d_x alm solve for x   ]
@@ -151,7 +148,6 @@ def main():
     fig.tight_layout()
     # plt.savefig('pix/Given_sample.png', dpi=fig.dpi)
     plt.show()
-
 
 if __name__ == "__main__":
     main()
