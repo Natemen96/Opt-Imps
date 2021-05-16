@@ -8,7 +8,7 @@ from cvxopt.solvers import qp
 import matplotlib.pyplot as plt
 
 def generate_vars(n=100, m = 30):
-    """[returns Q- nxn, A - mxn, b - mx1]
+    """[returns B- nxn, A - mxn, c - mx1]
 
     Args:
         n (int, optional): [number of columns]. Defaults to 100.
@@ -21,93 +21,94 @@ def generate_vars(n=100, m = 30):
 
     I = np.eye(n)
     K = np.random.normal(scale=sigma, size=(n,n))
-    Q = I + K + K.T
+    
     A = np.random.uniform(size=(m,n))
-    b = np.random.uniform(size=(m))
-    return Q, A, b
+    B = I + K + K.T
+    c = np.random.uniform(size=(m))
+    return A, B, c
 
-def cvxpot_qp(A,b,Q):
+def cvxpot_qp(A,c,B):
     """[return x_star]
 
     Args:
         A ([np.array]): [A - mxn]
-        b ([np.array]): [b - mx1]
-        Q ([np.array]): [Q - nxn]
+        c ([np.array]): [c - mx1]
+        B ([np.array]): [B - nxn]
 
     Returns:
-        [type]: [description]
+        [type]: [x_star]
     """    
     m = A.shape[0]
     n = A.shape[1]
 
     q = matrix(np.zeros((n,1)))
-    P = matrix(Q)
+    P = matrix(B)
     A = matrix(A)
-    b = matrix(b)
+    b = matrix(c)
     cvx_results= qp(P = P, q = q, A=A, b=b)
 
     return np.asarray(cvx_results['x']).flatten()
 
-def lagrangian_x(A,b,Q,c,lam):
+def lagrangian_x(A,c,B,c_k,lam):
     """[returns x_k based on d_x alm solve for x   ]
 
     Args:
         A ([np.array]): [A - mxn]
-        b ([np.array]): [b - mx1]
-        Q ([np.array]): [Q - nxn]
-        c ([float]): [variable will the following condition
+        c ([np.array]): [c - mx1]
+        B ([np.array]): [B - nxn]
+        c_k ([float]): [variable will the following condition
          must be > 0, -> infty, c_{i} <= c_{i+1} ]
         lam ([np.array]): [lam - mx1]
 
     Returns:
         [x]: [mx1 np.array]
     """    
-    leftside = 2*Q+(c*A.T@A)
-    rightside = (c*A.T@b) - (A.T@lam)
+    leftside = 2*B+(c_k*A.T@A)
+    rightside = (c_k*A.T@c) - (A.T@lam)
     x = np.linalg.pinv(leftside)@rightside
     return x.flatten()
 
-def constraint(A,x,b):
+def constraint(A,x,c):
     """[returns output of constraint]
 
     Args:
         A ([np.array]): [A - mxn]
         x ([np.array]): [x - mx1]
-        b ([np.array]): [b - mx1]
+        c ([np.array]): [c - mx1]
 
     Returns:
         [type]: [mx1]
     """    
-    return (A@x) - b 
+    return (A@x) - c 
 
-def alm(Q,A,b, epsilon=10**(-10)):
+def alm(B,A,c, epsilon=10**(-10)):
     """[uses Augmented Lagrangian method to find an x_k simlar to x_star]
 
     Args:
-        Q ([np.array]): [Q - nxn]
+        B ([np.array]): [B - nxn]
         A ([np.array]): [A - mxn]
-        b ([np.array]): [b - mx1]
+        c ([np.array]): [c - mx1]
         epsilon ([float], optional): [threshold value]. Defaults to 10**(-13).
 
     Returns:
         [list]: [list of relative error ]
     """    
-    x_star = np.asarray(cvxpot_qp(A,b,Q*2)).flatten()
+    x_star = np.asarray(cvxpot_qp(A,c,B*2)).flatten()
     error_i = [] 
 
-    lambda_k = np.zeros(b.shape)
+    lambda_k = np.zeros(c.shape)
     #c_k must be > 0, -> infinity, c_k_{i} <= c_k_{i+1} 
     c_k =.1
     i = 0 
     while True:
-        x_k = lagrangian_x(A,b,Q,c_k,lambda_k)
+        x_k = lagrangian_x(A,c,B,c_k,lambda_k)
         error = np.linalg.norm(x_k - x_star) /  np.linalg.norm(x_star)
         error_i.append(error)
-        stopping = np.linalg.norm(A@x_k - b)
+        stopping = np.linalg.norm(A@x_k - c)
         if stopping <= epsilon:
             return x_k, i, error_i
         
-        lambda_k += c_k*constraint(A,x_k,b)
+        lambda_k += c_k*constraint(A,x_k,c)
 
         c_k = 2.0**i
 

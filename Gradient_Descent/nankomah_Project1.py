@@ -35,41 +35,41 @@ def is_pos_def(x):
 
 # B,c,d = gen_B_c_d() #uncomment for testing
 
-def f_x(x ,Q = B, b =c, c = d):
+def f_x(x ,B = B, c =c, d = d):
     """[Mathematical Function of Interest: f(x) = x^T Q x + b^T x + c]
 
     Args:
         x ([numpy vector]): [(5,1) numpy Vector]
-        Q ([numpy matrix], optional): [(5,5) numpy P.D Matrix]. Defaults to Q.
-        b ([numpy vector], optional): [(5,1) numpy vector]. Defaults to b.
-        c ([numpy scaler], optional): [() numpy scaler]. Defaults to c.
+        B ([numpy matrix], optional): [(5,5) numpy P.D Matrix]. Defaults to Q.
+        c ([numpy vector], optional): [(5,1) numpy vector]. Defaults to b.
+        d ([numpy scaler], optional): [() numpy scaler]. Defaults to c.
 
     Returns:
         [numpy scaler]: [() numpy scaler]
     """    
-    return x.T@Q@x + b.T@x + c 
+    return x.T@B@x + c.T@x + d 
 
-def nabla_f_x(x ,Q = B, b =c):
+def nabla_f_x(x ,B = B, c =c):
     r"""[Gradient of Mathematical Function of Interest: \nabla f(x) = 2Qx +b ]
 
     Args:
         x ([numpy vector]): [(5,1) numpy vector]
-        Q ([numpy matrix], optional): [(5,5) numpy P.D Matrix]. Defaults to Q.
-        b ([numpy vector], optional): [(5,1) numpy vector]. Defaults to b.
+        B ([numpy matrix], optional): [(5,5) numpy P.D Matrix]. Defaults to Q.
+        c ([numpy vector], optional): [(5,1) numpy vector]. Defaults to b.
 
     Returns:
         [numpy vector]: [(5,1) numpy vector]
     """    
 
-    return 2*Q@x + b
+    return 2*B@x + c
 
-def get_alpha_k(x_k, Q, method = 0 ):
+def get_alpha_k(x_k, B, method = 0 ):
     """[Provides 3 different ways of finding alpha]
 
     Args:
         x_k ([numpy vector]): [(5,1) numpy vector - Take your best guess ]
         method (int, optional): [0 - Line search, 1 - Armijo method, otherwise - Steepest descent method]. Defaults to 0.
-        Q ([numpy matrix], optional): [(5,5) numpy P.D Matrix]. Defaults to Q.
+        B ([numpy matrix], optional): [(5,5) numpy P.D Matrix]. Defaults to Q.
 
     Returns:
         [float64]: [desired alpha value]
@@ -131,7 +131,7 @@ def get_alpha_k(x_k, Q, method = 0 ):
             [type]: [desired alpha]
         """ 
         num = nabla_f_x(x_k).T@nabla_f_x(x_k)
-        dom = 2*nabla_f_x(x_k).T@Q@nabla_f_x(x_k)
+        dom = 2*nabla_f_x(x_k).T@B@nabla_f_x(x_k)
         alpha = num/dom 
         return alpha
 
